@@ -3,6 +3,7 @@
 const JSON = require('../lib');
 const is = require('is-type-of');
 const assert = require('assert');
+const urlparse = require('url').parse;
 
 describe('test/index.test.js', () => {
 
@@ -115,5 +116,23 @@ describe('test/index.test.js', () => {
     assert.deepEqual(JSON.decode(buf), {
       fn: null,
     });
+  });
+
+  it('should encode & encode object without prototype', () => {
+    const url = urlparse('https://github.com?s=123', true);
+    // url.query => { s: '123' } has no prototype
+    let buf = JSON.encode(url);
+    assert(is.buffer(buf));
+    assert.deepEqual(JSON.decode(buf), url);
+
+    const obj = Object.create(null, {
+      a: {
+        enumerable: true,
+        value: '123',
+      },
+    });
+    buf = JSON.encode(obj);
+    assert(is.buffer(buf));
+    assert.deepEqual(JSON.decode(buf), obj);
   });
 });
