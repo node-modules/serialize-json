@@ -1,4 +1,9 @@
 
+1.0.2 / 2017-09-22
+==================
+
+  * refactor: enhance encode/decode large array performance (#4)
+
 1.0.1 / 2017-02-09
 ==================
 
