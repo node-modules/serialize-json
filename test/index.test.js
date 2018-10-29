@@ -56,7 +56,7 @@ describe('test/index.test.js', () => {
   });
 
   it('should encode & decode buffer', () => {
-    const buffer = new Buffer('hello world');
+    const buffer = Buffer.from('hello world');
     const buf = JSON.encode(buffer);
     assert(is.buffer(buf));
     assert.deepEqual(JSON.decode(buf), buffer);
@@ -101,7 +101,7 @@ describe('test/index.test.js', () => {
       f: null,
       g: undefined,
       h: new Date(),
-      i: new Buffer('this is a buffer'),
+      i: Buffer.from('this is a buffer'),
       j: new Error('this is a error'),
     };
     let buf = JSON.encode(json);
