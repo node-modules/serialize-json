@@ -2,8 +2,7 @@
 
 const Benchmark = require('benchmark');
 const benchmarks = require('beautify-benchmark');
-const suite = new Benchmark.Suite();
-
+const v8 = require('v8');
 const JSONSerialize = require('..');
 
 const json = {
@@ -18,10 +17,26 @@ const json = {
   pid: 81281,
   side: 'provider',
   timestamp: 1481613276143,
+  date: new Date(),
+  buf: Buffer.from('hello buffer 😄'),
+  // err: new Error('foo error'),
+  // map: new Map(),
 };
 
-const buf1 = new Buffer(JSON.stringify(json));
+const buf1 = Buffer.from(JSON.stringify(json));
 const buf2 = JSONSerialize.encode(json);
+const buf3 = v8.serialize(json);
+// console.log(typeof json, buf3)
+// for (const k in json) {
+//   const v = json[k];
+//   console.log(typeof v, k, v8.serialize(v));
+// }
+
+console.log(JSON.parse(buf1));
+console.log(JSONSerialize.decode(buf2));
+console.log(v8.deserialize(buf3));
+
+const suite = new Benchmark.Suite();
 
 // add tests
 suite
@@ -30,6 +45,9 @@ suite
   })
   .add('JSONSerialize.decode(buf2)', function() {
     JSONSerialize.decode(buf2);
+  })
+  .add('v8.deserialize(buf3)', function() {
+    v8.deserialize(buf3);
   })
   .on('cycle', function(event) {
     benchmarks.add(event.target);
@@ -42,9 +60,10 @@ suite
   })
   .run({ async: false });
 
-// node version: v6.9.2, date: Mon Feb 06 2017 21:33:01 GMT+0800 (CST)
+// node version: v10.13.0, date: Sun Nov 11 2018 23:05:47 GMT+0800 (China Standard Time)
 // Starting...
-// 2 tests completed.
-
-// JSON.parse(buf1.toString()) x 464,798 ops/sec ±1.62% (90 runs sampled)
-// JSONSerialize.decode(buf2)  x  45,589 ops/sec ±1.21% (90 runs sampled)
+// 3 tests completed.
+//
+// JSON.parse(buf1.toString()) x 314,187 ops/sec ±0.96% (92 runs sampled)
+// JSONSerialize.decode(buf2)  x  56,123 ops/sec ±1.31% (88 runs sampled)
+// v8.deserialize(buf3)        x 176,858 ops/sec ±9.81% (68 runs sampled)
