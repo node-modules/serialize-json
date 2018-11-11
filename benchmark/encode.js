@@ -5,6 +5,7 @@ const benchmarks = require('beautify-benchmark');
 const suite = new Benchmark.Suite();
 
 const JSONSerialize = require('..');
+const v8 = require('v8');
 
 const json = {
   anyhost: true,
@@ -18,10 +19,13 @@ const json = {
   pid: 81281,
   side: 'provider',
   timestamp: 1481613276143,
+  date: new Date(),
+  buf: Buffer.from('hello buffer 😄'),
 };
 
 console.log(new Buffer(JSON.stringify(json)).length);
 console.log(JSONSerialize.encode(json).length);
+console.log(v8.serialize(json).length);
 
 // add tests
 suite
@@ -30,6 +34,9 @@ suite
   })
   .add('JSONSerialize.encode(json)', function() {
     JSONSerialize.encode(json);
+  })
+  .add('v8.serialize(json)', function() {
+    v8.serialize(json);
   })
   .on('cycle', function(event) {
     benchmarks.add(event.target);
@@ -42,9 +49,10 @@ suite
   })
   .run({ async: false });
 
-// node version: v6.9.2, date: Mon Feb 06 2017 21:31:12 GMT+0800 (CST)
+// node version: v10.13.0, date: Sun Nov 11 2018 23:10:25 GMT+0800 (China Standard Time)
 // Starting...
-// 2 tests completed.
-
-// new Buffer(JSON.stringify(json)) x 365,334 ops/sec ±1.44% (87 runs sampled)
-// JSONSerialize.encode(json)       x  43,591 ops/sec ±1.23% (85 runs sampled)
+// 3 tests completed.
+//
+// new Buffer(JSON.stringify(json)) x 186,784 ops/sec ±1.18% (86 runs sampled)
+// JSONSerialize.encode(json)       x  53,639 ops/sec ±1.16% (88 runs sampled)
+// v8.serialize(json)               x   3,921 ops/sec ±46.68% (11 runs sampled)
